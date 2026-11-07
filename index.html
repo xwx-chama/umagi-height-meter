@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>うまぎ身長計</title>
+<meta name="description" content="netkeibaの競走成績をコピペするだけで、競走馬を擬人化したときの身長を計算するツールです。">
+<meta name="theme-color" content="#ffffff">
+<meta property="og:type" content="website">
+<meta property="og:title" content="うまぎ身長計">
+<meta property="og:description" content="netkeibaの競走成績をコピペするだけで、競走馬を擬人化したときの身長を計算するツールです。">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237fd3c3'/%3E%3Cg stroke='%23fff' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M22 12v40'/%3E%3Cpath d='M22 18h10M22 28h16M22 38h10M22 48h16'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<!-- PC向けの横並び表示。不要ならこの1行を消せば元の縦長表示に戻ります -->
+<link rel="stylesheet" href="css/wide.css" media="(min-width: 1280px)">
+</head>
+<body>
+<main class="page">
+  <noscript><p class="noscript">このツールはJavaScriptを使います。ブラウザの設定でJavaScriptを有効にしてください。</p></noscript>
+
+  <header class="hero">
+    <h1>うまぎ身長計</h1>
+    <p class="subtitle">馬体重の平均から、擬人化したときの身長を計算するツールです。<strong class="em">元性別擬人化前提</strong>です。</p>
+    <p class="subnote">※某娘化には対応していません。</p>
+  </header>
+
+
+  <div class="col col-input">
+  <section class="card card-howto">
+    <h2>使い方</h2>
+    <ol class="howto">
+      <li>調べたい馬の性別を選ぶ</li>
+      <li>netkeibaで、調べたい馬の個別ページを開く</li>
+      <li>競走成績の表を、左上端の「レース名」から右下端までドラッグして、表全体が青くなるように選択し、コピーする。スマホ版は、必ず「詳細表示」に切り替えてから選択する</li>
+      <li>下の入力欄に、コピーしたデータを貼る</li>
+    </ol>
+  </section>
+
+  <section class="card card-sex">
+    <h2>性別</h2>
+    <div class="seg seg-2" role="radiogroup" aria-label="性別">
+      <label><input type="radio" name="sex" value="male"><span>牡馬・セン馬</span></label>
+      <label><input type="radio" name="sex" value="female"><span>牝馬</span></label>
+    </div>
+  </section>
+
+  <section class="card card-input">
+    <h2>馬体重の入力</h2>
+    <div class="seg seg-2 mode-seg" role="radiogroup" aria-label="入力方法">
+      <label><input type="radio" name="mode" value="paste" checked><span>成績を貼り付け</span></label>
+      <label><input type="radio" name="mode" value="manual"><span>馬体重を直接入力</span></label>
+    </div>
+
+    <div id="manualMode" hidden>
+      <div class="manual">
+        <label for="manualW">馬体重</label>
+        <input type="number" id="manualW" inputmode="decimal" step="any" min="1" max="1500" placeholder="例：480">
+        <span>kg</span>
+      </div>
+      <p class="status" id="manualStatus" aria-live="polite"></p>
+    </div>
+
+    <div id="pasteMode">
+    <p class="hint"><label for="paste">全レース分をコピーして貼り付けてください</label></p>
+    <textarea id="paste" rows="6" placeholder="ここに貼り付け" spellcheck="false" autocomplete="off"></textarea>
+    <div class="row-between">
+      <div class="format" id="formatBox">
+        <label for="format">形式</label>
+        <select id="format">
+          <option value="auto">自動</option>
+          <option value="pc">PC版</option>
+          <option value="sp">スマホ版</option>
+        </select>
+      </div>
+      <button type="button" class="link-btn" id="clearBtn">クリア</button>
+    </div>
+    <p class="status" id="status" aria-live="polite"></p>
+    </div>
+  </section>
+  </div>
+
+  <div class="col col-settings">
+  <section class="card card-settings">
+    <h2>設定</h2>
+
+    <div class="field">
+      <div class="label">計算方法</div>
+      <div class="methods" role="radiogroup" aria-label="計算方法">
+        <label class="method">
+          <input type="radio" name="method" value="original" checked>
+          <span class="method-body">
+            <span class="method-name">オリジナル計算<span class="badge">おすすめ</span></span>
+            <span class="method-desc">このツール独自の計算方法です。バランス型です。</span>
+          </span>
+        </label>
+        <label class="method">
+          <input type="radio" name="method" value="simple">
+          <span class="method-body">
+            <span class="method-name">シンプル計算</span>
+            <span class="method-desc">平均馬体重と平均身長の比で、そのまま計算します。平均から離れるほど、数値が極端になりやすい傾向があります。</span>
+          </span>
+        </label>
+        <label class="method">
+          <input type="radio" name="method" value="mild">
+          <span class="method-body">
+            <span class="method-name">BMI計算</span>
+            <span class="method-desc">馬体重→人間の体重→標準BMI→身長の順で計算します。平均から離れても身長の変化が小さいです。</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div id="dataFields">
+    <div class="field">
+      <div class="label">フィルタ</div>
+      <label class="check">
+        <input type="checkbox" id="excludeDebut">
+        <span>デビュー年のレースを除外</span>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="top3">
+        <span>3着以内のみ</span>
+      </label>
+    </div>
+
+    <div class="field">
+      <div class="label">参照データ数</div>
+      <div class="seg seg-2" role="radiogroup" aria-label="参照データ数">
+        <label><input type="radio" name="limit" value="all" checked><span>制限なし</span></label>
+        <label><input type="radio" name="limit" value="recent"><span>直近の有効データ</span></label>
+      </div>
+      <div class="recent" id="recentBox">
+        直近 <input type="number" id="recentN" inputmode="numeric" min="1" max="99" value="5" aria-label="直近N走"> 走分の有効データ
+      </div>
+    </div>
+    </div>
+
+    <div class="field">
+      <div class="label">体型</div>
+      <div class="seg seg-3" role="radiogroup" aria-label="体型">
+        <label><input type="radio" name="body" value="slim"><span>細身</span></label>
+        <label><input type="radio" name="body" value="standard" checked><span>標準</span></label>
+        <label><input type="radio" name="body" value="sturdy"><span>がっちり</span></label>
+      </div>
+      <small class="hint body-hint">細身は「馬体重のわりに体高が高い馬」、がっちりは「馬体重のわりに体高が低い馬」に使うのがおすすめです。迷ったら標準でOKです。</small>
+    </div>
+
+  </section>
+
+  <section class="summary" id="summary" aria-live="polite"></section>
+
+  <details class="card details" id="details">
+    <summary>詳しく見る</summary>
+    <dl class="detail-list" id="detailList"></dl>
+  </details>
+  </div>
+
+  <footer class="note">
+    基準値は一般的な平均を参考にした目安です。創作・娯楽用で、実際の数値を保証するものではありません。
+  </footer>
+</main>
+
+<div class="result-bar" id="resultBar">
+  <div class="result-inner">
+    <div class="result-cols">
+      <div class="result-col">
+        <div class="result-label" id="avgLabel">平均馬体重</div>
+        <div class="result-num"><span id="avgW">--</span><span class="unit">kg</span></div>
+      </div>
+      <div class="result-col">
+        <div class="result-label">擬人化身長</div>
+        <div class="result-num big"><span id="height">--</span><span class="unit">cm</span></div>
+      </div>
+    </div>
+    <div class="result-meta" id="resultMeta">性別を選んで、競走成績を貼り付けてください</div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
