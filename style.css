@@ -247,24 +247,25 @@ input[type=number] {
   pointer-events: auto;
   max-width: var(--col);
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.97);
+  background: #fff;
   border-top: 2px solid var(--mint);
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -4px 20px rgba(58, 163, 145, 0.15);
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
 }
-.result-cols { display: grid; grid-template-columns: 1fr 1.25fr; }
-.result-col { text-align: center; }
+.result-cols { display: grid; grid-template-columns: 1fr 1fr; }
+/* 左右それぞれ上下中央にそろえる */
+.result-col { text-align: center; display: flex; flex-direction: column; justify-content: center; }
 .result-col + .result-col { border-left: 1.5px dashed var(--line); }
 .result-label { font-size: 12px; color: var(--text-sub); font-weight: 500; }
 .result-num {
   color: var(--result);
   font-weight: 700;
-  font-size: 28px;
-  line-height: 1.2;
+  font-size: 34px;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
-.result-num.big { font-size: 38px; }
+.result-num.big { font-size: 34px; } /* スマホは左右同じ大きさ */
 .result-num .unit { font-size: 14px; margin-left: 2px; }
 .result-meta { font-size: 11px; color: var(--text-sub); text-align: center; margin-top: 4px; line-height: 1.5; }
 .result-meta .warn { color: var(--warn-text); }
