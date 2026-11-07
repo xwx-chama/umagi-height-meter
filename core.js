@@ -135,6 +135,12 @@
     });
   }
 
+  // スマホ版の2桁の年を4桁に直す（今年の下2桁より大きければ1900年代。例：99→1999、24→2024）
+  function fullYear(yy) {
+    yy = +yy;
+    return yy > new Date().getFullYear() % 100 ? 1900 + yy : 2000 + yy;
+  }
+
   function parseSP(text) {
     var lines = normalize(text).split('\n');
     var map = {};
@@ -146,7 +152,7 @@
       if (m) {
         var key = line.replace(/\s+/g, ' ');
         if (!map[key]) {
-          map[key] = { date: makeDate(2000 + +m[1], m[2], m[3]), rank: null, rankText: '', weight: null, hasData: false };
+          map[key] = { date: makeDate(fullYear(m[1]), m[2], m[3]), rank: null, rankText: '', weight: null, hasData: false };
           order.push(key);
         }
         cur = map[key];
